@@ -72,3 +72,9 @@ ERROR [2015-03-09 12:41:51,110] (ProjectPackageList.java:generateComponents:481)
  WARN [2015-03-09 12:41:51,115] (ComponentFactory.java:getComponentByFilePath:622) - No id found for filepath 'applicationManifests/Salesforce1_for_Windows', tagging as component of type 'Unknown'
  WARN [2015-03-09 12:41:58,997] (ProjectPackageList.java:saveResources:1158) - Component list in project package 'Salesforce Connected Apps' is empty.  No resources to save.
  WARN [2015-03-09 12:42:00,690] (ProjectPackageList.java:saveResources:1158) - Component list in project package 'Salesforce1 and Chatter Apps' is empty.  No resources to save.
+ WARN [2015-03-09 12:45:12,104] (ComponentController.java:checkInFolder:181) - Component resource 'test.cls' already exists in project
+ WARN [2015-03-09 12:45:15,943] (ComponentFactory.java:getCompositeComponentFromComponent:1102) - Unable to load existing 'classes/testme.cls-meta.xml' from project - associated component's file resource is null.  Assuming new.
+ WARN [2015-03-09 12:45:16,118] (ComponentController.java:deploy:402) - Remote save aborted - project is not online enabled
+ WARN [2015-03-09 12:45:16,145] (Utils.java:loadDocument:794) - Unable to load document: C:\Users\nbret00\git2\CSCForms2Training\.metadata\.plugins\org.eclipse.core.resources\.projects\CSCForm\com.salesforce.ide.core\packageCache.xml (The system cannot find the file specified)
+ WARN [2015-03-09 12:45:16,146] (ComponentController.java:run:380) - Unable to update cache with new component Apex Class - cache is not found
+ WARN [2015-03-09 12:45:16,294] (DefaultBuilder.java:applyDirtyMarkers:94) - TODO: apply 'Save locally only...' markers on each resource
