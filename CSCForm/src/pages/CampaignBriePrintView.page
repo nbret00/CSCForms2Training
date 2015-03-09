@@ -1,0 +1,229 @@
+<apex:page standardController="Campaign__c" extensions="CampaignBriefController" id="pg" title="Campaign Creative Brief" sidebar="false" showHeader="false">
+  <style>
+    .container {
+      width: 100%;
+    }
+    .label {
+      width: 15%;
+      background-color: #D9D9D9;
+      font-weight: bold;
+      vertical-align: middle;
+    }
+    
+    .data {
+      width: 35%;
+      vertical-align: middle;
+    }
+    
+    .checkboxColumn label {
+      font-weight:bold;
+    }
+    
+    .backgroundHeader {
+      background-color: #D9D9D9;
+    }
+    
+    .backgroundLabel {
+      font-weight: bold;
+      vertical-align: middle;
+      width: 25%;
+    }
+    .backgroundData {
+      vertical-align: middle;
+    }
+    
+    .labelClass {
+      font-weight: bold;
+    }
+    
+    textarea {
+      width: 99%;
+    }
+  </style>
+
+    <apex:sectionHeader title="Campaign Communication Brief" />
+    <apex:pageMessages id="msgs" />
+      <div class="container" id="containerBlock">
+        <table width="100%" border="1" cellpadding="5" cellspacing="0">
+         <tr>
+           <td class="label">{!$ObjectType.Campaign__c.Fields.Name.Label}</td>
+           <td class="data" colspan="3">
+             <apex:outputField value="{!projectRecord.Name}" />
+           </td>
+         </tr>
+         <tr>
+           <td class="label">Requestor</td>
+           <td class="data" colspan="3">
+             <apex:outputField value="{!projectRecord.Requestor__c}" />
+           </td>
+         </tr>
+         <tr>
+           <td class="label">Requestor Department</td>
+           <td class="data"><apex:outputField value="{!projectRecord.Requestor__r.Department}" /></td>
+           <td class="label">Requestor Phone</td>
+           <td class="data" ><apex:outputField value="{!projectRecord.Requestor__r.Phone}" /></td>
+         </tr>
+         <tr>
+           <td class="label">VP</td>
+           <td class="data"><apex:outputField value="{!projectRecord.Requestor__r.ManagerId}" /></td>
+           <td class="label">{!$ObjectType.Campaign__c.Fields.Go_Live_Date__c.Label}</td>
+           <td class="data"><apex:outputField value="{!projectRecord.Go_Live_Date__c}" /></td>
+         </tr>
+         <tr>
+           <td class="label">{!$ObjectType.Campaign__c.Fields.KickOff__c.Label}</td>
+           <td class="data"><apex:outputField value="{!projectRecord.KickOff__c}" /></td>
+           <td class="label">{!$ObjectType.Campaign__c.Fields.Deadline__c.Label}</td>
+           <td class="data"><apex:outputField value="{!projectRecord.Deadline__c}" /></td>
+         </tr>
+        </table>
+        
+        <br/><br/>
+        <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+           <tr class="backgroundHeader">
+             <td class="backgroundLabel">{!$ObjectType.Campaign__c.Fields.Background__c.Label}</td>
+             <td class="backgroundData">What is the Campaign and why is it being initiated?</td>
+           </tr>        
+         <tr>
+           <td colspan="2">
+             <apex:outputField value="{!projectRecord.Background__c}"/>
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">Campaign Assignment</td>
+           <td class="backgroundData">What are the specific details?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Campaign__c.Fields.Objectives__c.Label}:</label>&nbsp; 
+             <apex:outputField value="{!projectRecord.Objectives__c}" />
+           </td>
+         </tr>   
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Campaign__c.Fields.Size_of_Prize__c.Label}:</label>&nbsp; 
+             <apex:outputField value="{!projectRecord.Size_of_Prize__c}" />
+           </td>
+         </tr>  
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Campaign__c.Fields.Business_and_marketing_success_measures__c.Label}:</label>&nbsp; 
+             <apex:outputField value="{!projectRecord.Business_and_marketing_success_measures__c}" />
+           </td>
+         </tr>    
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">Shopper Profile</td>
+           <td class="backgroundData">Who are we trying to reach?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Campaign__c.Fields.Target_Audience__c.Label}:</label>&nbsp; 
+             <apex:outputField value="{!projectRecord.Target_Audience__c}" />
+           </td>
+         </tr> 
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Campaign__c.Fields.Source_of_Volume__c.Label}: </label>&nbsp; 
+             <apex:outputField value="{!projectRecord.Source_of_Volume__c}" />
+           </td>
+         </tr>         
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Campaign__c.Fields.Consumer_and_Shopper_Insights__c.Label}</td>
+           <td class="backgroundData">What insights are influencing the program?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">{!projectRecord.Consumer_and_Shopper_Insights__c}</td>
+         </tr>        
+      </table>
+
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Campaign__c.Fields.Shopper_Barriers_to_Purchase__c.Label}</td>
+           <td class="backgroundData">Why aren't shoppers engaged?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <apex:outputField value="{!projectRecord.Shopper_Barriers_to_Purchase__c}" />
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Campaign__c.Fields.Hierarchy__c.Label}</td>
+           <td class="backgroundData">What is the #1 benefit you want the shopper to know?  Provide detailed proof points that support the benefit.</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <apex:outputField value="{!projectRecord.Hierarchy__c}" />
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Campaign__c.Fields.Mandatories__c.Label}</td>
+           <td class="backgroundData">Are there additional considerations to be aware of?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">{!projectRecord.Mandatories__c}</td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Campaign__c.Fields.Duration__c.Label}</td>
+           <td class="backgroundData">What is the milestone schedule?</td>
+         </tr>        
+         <tr>
+           <td colspan="2"><apex:outputText value="{!projectRecord.Duration__c} Days" rendered="{!projectRecord.Duration__c != null}"/></td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Campaign__c.Fields.Budget__c.Label}</td>
+           <td class="backgroundData">What is the allocated budget?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <apex:outputField value="{!projectRecord.Budget__c}" />
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Campaign__c.Fields.Communication_Strategy__c.Label}</td>
+           <td class="backgroundData">What are the communication vehicles (include objectives, call to action for each if different)?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+              <apex:outputField value="{!projectRecord.Communication_Strategy__c}" />
+           </td>
+         </tr>        
+      </table>
+    </div>
+  <script>
+    window.onload = function() {
+      window.print();
+    }
+  </script>
+</apex:page>

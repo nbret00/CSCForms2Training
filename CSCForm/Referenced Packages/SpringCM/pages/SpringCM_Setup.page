@@ -1,0 +1,187 @@
+<apex:page controller="SpringCMEos.SetupSpringCMController" extensions="SpringCMEos.SetupCustomObjects,SpringCMEos.SetupEnvironment" action="{!Setup}">
+   <style>
+   		.setupPage table div {padding-bottom:2px;}
+   		.eosTd {width:30%;
+   			padding-bottom:4px;}
+   		.envTd {width:150px; 
+   			padding-bottom:4px;}
+   		.eosRow {padding-bottom:2px;}
+   		.header { font-family: Arial;
+   			color: #E68E26; 
+   			font-size: 24px; 
+   			font-weight: bold;
+   			padding-bottom: 7px;
+   			padding-top:15px;
+   		}
+   		.subHeader 
+   		{
+   			font-family: Arial;
+   			color:  #666666;
+   			font-size: 18px;
+   			padding-bottom: 15px;
+   		}
+   		.tableHeader
+   		{
+   			font-family: Arial;
+   			color: #222222;
+   			font-size: 14px;
+   			float: left;
+			width: 30%;
+			font-weight: bold;
+   		}
+   		.spanHeader
+   		{
+   			font-family: Arial;
+   			color: #222222;
+   			font-size: 12px;
+   			float: left;
+			width: 125px;
+   		}
+   		.help
+   		{
+   			float:right;
+   		}
+   		.inputField { width: 250px;}
+   		
+   		.setupPage a:hover
+		{
+			color:#d13393;
+		} 
+		.setupPage a
+		{
+			color:#29bdbe;
+		} 
+   </style>
+	  
+   <apex:form styleClass="setupPage" >
+   <apex:outputPanel id="msgs" >
+     <apex:pageMessages />
+    </apex:outputPanel>
+   
+	<div>
+	<div class="help"><a onclick="javascript:window.open('http://www.springcm.com/knowledge-article/salesforce-integration-help-links');">Help</a></div>
+	<div class="header">Integrate</div>
+	<div class="subHeader">Select Your SpringCM Environment</div>
+		<apex:outputPanel id="envs">
+		<table>
+			<tr>
+				<td class="envTd">
+        			<span class="spanHeader">SpringCM Environment</span>
+        		</td>
+				<td>
+				<apex:outputPanel rendered="{!NOT(envObject.disabled)}"> 
+				<apex:selectList required="false" size="1" value="{!envObject.env}" title="Environments" >
+                    <apex:selectOptions value="{!items}" />    
+            	</apex:selectList>
+            	</apex:outputPanel>
+            	<apex:outputPanel rendered="{!envObject.disabled}">
+            	{!envObject.env} 
+            	</apex:outputPanel>
+            	</td>
+            	<td>
+            	<apex:commandLink action="{!editEnv}" rendered="{!envObject.disabled}" reRender="envs,msgs" >
+            		<apex:image url="{!$Resource.SpringCMEos__scmPencil}"/>
+            	</apex:commandLink>
+            </td>
+            <td>
+            	<apex:commandLink action="{!saveEnv}" rendered="{!NOT(envObject.disabled)}" reRender="envs,msgs" >
+            		<apex:image url="{!$Resource.SpringCMEos__scmDisk}"/>
+            	</apex:commandLink> 
+             </td>
+             <td>
+            	<apex:commandLink action="{!cancelEnv}" rendered="{!NOT(envObject.disabled)}" reRender="envs,msgs" >
+            		<apex:image url="{!$Resource.SpringCMEos__scmGrayx}"/>
+            	</apex:commandLink>   
+            </td>
+        	</tr>
+        	</table>
+        	
+        	<table> 
+        		<tr>
+        		<td class="envTd">
+        			<span class="spanHeader">SpringCM Account ID:</span>
+        		</td>
+        		<td> 
+        		{!accountInfoFromSpring.AccountId}
+        		</td>
+        	</tr>
+        	<tr>
+        		<td class="envTd"> 
+        			<span class="spanHeader">SpringCM REST URL:</span>
+        		</td>
+        		<td>
+        		{!accountInfoFromSpring.RestUrlString}			
+        		</td>
+        	</tr>
+        	</table>
+        </apex:outputPanel>
+	</div>
+	
+	<div>
+		<div class="header" >Configure </div>
+		<div class="subHeader">SpringCM Document Viewers</div>
+		<div>
+			<span class="tableHeader">Salesforce Object</span>
+			<span class="tableHeader">SpringCM Folder Path</span>
+			<span class="tableHeader">SpringCM Folder Name</span>
+		</div>
+		 
+		<apex:dataTable id="oldTable" value="{!eosList}" styleClass="eostable" var="e" width="100%" rowClasses="eosRow">
+            <apex:column styleClass="eosTd" >
+            	<apex:outputPanel rendered="{!NOT(e.disabled)}">
+            	<apex:selectList required="false" id="selectFields" size="1" value="{!e.eos.name}" title="Types" >
+                    <apex:selectOptions id="objectType" value="{!ObjectTypes}" />   
+                </apex:selectList>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!e.disabled}">
+                	{!e.eos.name}
+                </apex:outputPanel>
+            </apex:column>
+            <apex:column styleClass="eosTd" >
+            	<apex:outputPanel rendered="{!NOT(e.disabled)}">
+                	<apex:inputText styleClass="inputField" id="path" value="{!e.eos.SpringCMEos__Path__c}"  />
+                </apex:outputPanel>
+                 <apex:outputPanel rendered="{!e.disabled}">
+                	{!e.eos.SpringCMEos__Path__c}
+                </apex:outputPanel>
+            </apex:column>
+            <apex:column styleClass="eosTd" >
+            	<apex:outputPanel rendered="{!NOT(e.disabled)}">
+                <apex:inputText id="folderName" styleClass="inputField" value="{!e.eos.SpringCMEos__Folder_Name__c}"  />
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!e.disabled}">
+                	{!e.eos.SpringCMEos__Folder_Name__c}
+                </apex:outputPanel>
+            </apex:column>
+            <apex:column styleClass="eosTd" >
+            	<apex:commandLink action="{!editEos}" rendered="{!e.disabled}" reRender="oldTable,msgs" >
+            		<apex:param name="editId" value="{!e.eos.id}" assignTo="{!editId}" />
+            		<apex:image url="{!$Resource.SpringCMEos__scmPencil}"/>
+            	</apex:commandLink>
+            	<apex:commandLink action="{!saveEos}" rendered="{!NOT(e.disabled)}" reRender="oldTable,msgs" >
+            		<apex:param name="saveId" value="{!IF(e.eos.id != '', e.eos.id, e.eos.SpringCMEos__Variables__c)}" assignTo="{!editId}" />
+            		<apex:image url="{!$Resource.SpringCMEos__scmDisk}"/>
+            	</apex:commandLink> 
+            	<apex:commandLink action="{!cancelRow}" rendered="{!NOT(e.disabled)}" reRender="oldTable,msgs" >
+            		<apex:param name="cancelId" value="{!IF(e.eos.id != '', e.eos.id, e.eos.SpringCMEos__Variables__c)}" assignTo="{!editId}" />
+            		<apex:param name="prevType" value="{!e.eos.name}" assignTo="{!prevType}" />
+            		<apex:param name="prevPath" value="{!e.eos.SpringCMEos__Path__c}" assignTo="{!prevPath}" />
+            		<apex:param name="prevName" value="{!e.eos.SpringCMEos__Folder_Name__c}" assignTo="{!prevName}" />
+            		<apex:image url="{!$Resource.SpringCMEos__scmGrayx}"/>
+            	</apex:commandLink>   
+            	<apex:commandLink action="{!deleteRow}" rendered="{!e.disabled}" reRender="oldTable,msgs" onclick="if(!confirm('Are you sure wish to delete this configuration?')){return};">
+            		<apex:param name="deleteId" value="{!IF(e.eos.id != '', e.eos.id, e.eos.SpringCMEos__Variables__c)}" assignTo="{!editId}" />
+            		<apex:image url="{!$Resource.SpringCMEos__scmRedx}" />
+				</apex:commandLink>
+            </apex:column>
+        </apex:dataTable>
+  
+			 <apex:actionFunction name="addRow" action="{!addNewObj}" rerender="oldTable,msgs" ></apex:actionFunction>
+        	<br></br> 
+        	<a id="link" onclick="addRow()" href="#">Add New Folder Portal Widget</a><br></br><br></br>
+	</div>
+  
+			<apex:commandButton action="{!PageTwo}" value="Configure Dynamic Search Widgets" immediate="true" title="Setup Dynamic Search Viewer"/>
+	
+    </apex:form>
+</apex:page>

@@ -1,0 +1,189 @@
+<apex:page id="pg" controller="JobTypeHierarchyController">
+  <apex:includeScript value="{!URLFOR($Resource.jquery1_10_2,'jquery-1.10.2.min.js')}" />
+  <style>
+   
+    .black_overlay{
+        display: none;
+        position: absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        z-index:1000;
+        -moz-opacity: 0.8;
+        opacity:.50;
+        filter: alpha(opacity=80);
+    }
+    .white_content {
+        display: none;
+        position: absolute;
+        top: 5%;
+        left:30%;
+        width: 450px;
+        height: 390px;
+        border-radius: 5px;
+        z-index:1100;
+        overflow: auto;
+        resize:none;
+    }
+    
+    #rightTable td {
+        padding-top: 1px; 
+    }
+    
+    thead {
+            background-color: #F2F3F3;
+        }
+        
+        .lightBoxHeader {
+            background: url('/img/alohaSkin/overlay_crns.png') 0;
+            padding-left: 0;
+            padding-right: 6px;
+            height: 60px;
+            padding-top: 3px;
+        }
+        
+        .closeIconImage{
+            background-image: url('/img/alohaSkin/closeX.png');
+            background-position: 0 0;
+            width: 20px;
+            height: 20px;
+        }
+        .closeIconImage:hover {
+            background-position: left -20px;
+        }
+        
+        #keyFields td{
+            vertical-align:middle;
+        }
+        
+        .white_content .editPage .detailList th  {
+          vertical-align: middle;
+					width: 30%;
+        }
+  </style>
+  <apex:form id="frm">
+    <apex:inputHidden id="selectedJobTypeId" value="{!selectedJobTypeId}"/>
+    <div id="backgroundDiv" style="width:100%;">
+      <apex:pageBlock title="Job Type" id="pageBlock" mode="edit" > 
+        <apex:pageBlockButtons >
+          <input type="button" value="Add Main" class="btn" onclick="problemOperation('{!OPERATION_ADD_SIBILING}', true, false, false); return false;"/>
+          <input type="button" value="Add Child" class="btn" onclick="problemOperation('{!OPERATION_ADD_CHILD}', false, true, false); return false;"/>
+          <input type="button" value="Edit" class="btn" onclick="problemOperation('{!OPERATION_EDIT}', false, false, false); return false;"/>
+          <input type="button" value="Delete" class="btn" onclick="deleteProblem(); return false;"/>
+        </apex:pageBlockButtons>
+        <br/>
+	             
+        <c:TreeViewComponent SelectedNode="{!selectedJobTypeId}" ObjectNameValue="Job_Type__c" SelectedCategoryValue="all" forPage="JobTypeHierarchy" counter="1" selectItemCallback="fetchSolutions" hiddenFieldName="pg:frm:selectedJobTypeId"/>
+       
+      </apex:pageBlock>
+    </div>
+    <apex:outputPanel id="modalWindow">
+     <div id="light" class="white_content">
+            <table width="100%" class="lightBoxHeader">
+                <tr>
+                    <td>
+                        <h2 class="mainTitle">Job Type</h2>
+                    </td>
+                    <td >
+                        <div class="closeIconImage" style="float: right;" onClick="hideLightBox();">&nbsp;</div>
+                    </td>
+                </tr>
+            </table>
+            <div id="content" style="margin-top: -30px;">
+            <apex:pageBlock id="pageBlock2" mode="edit">
+            <apex:pageBlockButtons >
+                <input id="finish1" type="button" class="btn" value="Save" onClick="saveJobType(); return false;"/>
+                <input type="button" class="btn" value="Cancel" onClick="hideLightBox();return false;"/>
+            </apex:pageBlockButtons>
+            <apex:pageMessages id="message"/>
+            <apex:pageBlockSection id="pageBlockSection2" columns="1">
+              <apex:inputField value="{!sObjectToBind['Parent__c']}" rendered="{!sObjectToBind['Parent__c'] != null}"/>
+              <apex:inputField value="{!sObjectToBind['Name']}" />
+              <apex:inputField value="{!sObjectToBind['Category__c']}" />
+            </apex:pageBlockSection>
+            <apex:outputpanel >
+		       <apex:actionstatus id="modalWindowStatus">
+		         <apex:facet name="start">
+		             <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+		                    height: 68%;opacity:0.65;width:100%;"> 
+		                 <div class="waitingHolder" style="width: 91px;">
+		                     <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+		                     <span class="waitingDescription">Please Wait...</span>
+		                 </div>
+		             </div>
+		         </apex:facet>
+		       </apex:actionstatus>
+		    </apex:outputpanel>
+        </apex:pageBlock>
+        </div>
+    </div>
+    <div id="fade" class="black_overlay"></div>
+    </apex:outputPanel>
+    
+    <apex:outputpanel >
+	     <apex:actionstatus id="status">
+         <apex:facet name="start">
+             <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                    height: 100%;opacity:0.65;width:100%;"> 
+                 <div class="waitingHolder" style="width: 91px;">
+                     <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                     <span class="waitingDescription">Please Wait...</span>
+                 </div>
+             </div>
+         </apex:facet>
+	     </apex:actionstatus>
+    </apex:outputpanel>
+    <apex:actionFunction action="{!refreshModalWindow}" name="refreshModalWindow" rerender="modalWindow" status="status" onComplete="showLightBox();">
+      <apex:param value="" name="selectedAction" assignTo="{!selectedAction}" />
+      <apex:param value="" name="selectedJobTypeId" assignTo="{!selectedJobTypeId}" />
+    </apex:actionFunction>
+    <apex:actionFunction action="{!deleteJobType}" name="deleteJobType" status="status" onComplete="callInitAction();">
+      <apex:param value="" name="selectedJobTypeId" assignTo="{!selectedJobTypeId}" />
+    </apex:actionFunction>
+    <apex:actionFunction action="{!saveJobType}" name="saveJobType" status="modalWindowStatus" onComplete="hideLightBox(); callInitAction();" />
+    
+    <script>
+         
+        function problemOperation(from, isAddMain, isAddChild, c){
+          var producId = document.getElementById("pg:frm:selectedJobTypeId").value;
+          if(isAddMain || (producId != '' && producId != 'undefine')) {
+              refreshModalWindow(from, producId);
+          }else{
+            if(isAddChild){
+              alert('Please select a parent first to add a child.');
+            } else {
+              alert('Please select a Job Type.');
+            }
+            return false;
+          }
+        }
+        
+        function deleteProblem(){
+          var producId = document.getElementById("pg:frm:selectedJobTypeId").value;
+          var msg = 'Please select a Job Type.';         
+          if(producId != ''){
+             if(confirm('Are you surely wanted to delete the selected Job Type?')){
+                deleteJobType(producId);
+             }
+          }else{
+            alert(msg);
+            return false;
+          }
+        }
+        
+         function showLightBox() {
+            document.getElementById('light').style.display = 'block';
+            document.getElementById('fade').style.display = 'block';
+         }
+    
+        function hideLightBox() {
+         document.getElementById('light').style.display = 'none';
+         document.getElementById('fade').style.display = 'none';
+        }
+          
+        function fetchSolutions(objId){}
+        </script>
+  </apex:form>
+</apex:page>

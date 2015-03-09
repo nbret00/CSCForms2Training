@@ -1,0 +1,63 @@
+<apex:component controller="SparkItItemListViewController">
+  <apex:pageblock id="pb" title="Items">
+    <apex:outputPanel rendered="{!sparkItItemList.size == 0}">
+      <table class="list" border="0" cellspacing="0" cellpadding="0">
+         <tbody><tr class="headerRow">
+             <th scope="col" class="noRowsHeader">No records to display</th></tr>
+         </tbody>
+      </table>
+    </apex:outputPanel> 
+    <apex:outputPanel rendered="{!sparkItItemList.size != 0}">
+      <apex:form >
+        <apex:outputPanel style="float:right;padding: 5px;">
+          <apex:commandLink status="status" reRender="pb" value="First" action="{!first}" title="First Page" rendered="{!hasPrevious}" style="text-decoration: none;"/>
+          <apex:outputText rendered="{!!hasPrevious}" value="First" style="color:gray;"/>
+          &nbsp;
+          <apex:commandLink status="status" reRender="pb" value="Previous" action="{!previous}" title="Previous Page" rendered="{!hasPrevious}" style="text-decoration: none;"/>
+          <apex:outputText rendered="{!!hasPrevious}" value="Previous" style="color:gray;"/>
+          &nbsp;
+          <apex:commandLink status="status" reRender="pb" value="Next" action="{!next}" title="Next Page" rendered="{!hasNext}" style="text-decoration: none;"/>
+          <apex:outputText rendered="{!!hasNext}" value="Next" style="color:gray;"/>
+          &nbsp;
+          <apex:commandLink status="status" reRender="pb" value="Last" action="{!last}" title="Last Page" rendered="{!hasNext}" style="text-decoration: none;"/>
+          <apex:outputText rendered="{!!hasNext}" value="Last" style="color:gray;"/>
+          
+<!--          <apex:outputText >{!(pageNumber * PAGE_SIZE)+1-PAGE_SIZE}-{!IF((pageNumber * PAGE_SIZE)>noOfRecords, noOfRecords,(pageNumber * PAGE_SIZE))} of {!noOfRecords}</apex:outputText> -->
+        </apex:outputPanel>
+        <apex:pageBlockTable value="{!sparkItItemList}" var="sparkItItem" >
+           <apex:column headerValue="Item Name">
+             <apex:outputLink value="/{!sparkItItem.Item__r.Id}" >{!sparkItItem.Item__r.Name}</apex:outputLink>
+           </apex:column>
+           <apex:column headerValue="Item No">
+             <apex:outputLabel >{!sparkItItem.Item__r.Item_No__c}</apex:outputLabel> 
+           </apex:column>
+           <apex:column headerValue="Status">
+             <apex:outputLabel >{!sparkItItem.Item__r.Status__c}</apex:outputLabel> 
+           </apex:column>
+           <apex:column headerValue="Release Date">
+             <apex:outputText value="{0,date,MM'/'dd'/'yyyy}"> <apex:param value="{!sparkItItem.Item__r.Deadline__c}" /> </apex:outputText>
+           </apex:column>  
+           <apex:column headerValue="Program">
+             <apex:outputLabel >{!sparkItItem.Item__r.Spark_It__r.Name}</apex:outputLabel> 
+           </apex:column>  
+           <apex:column headerValue="Job Type">
+             <apex:outputLabel >{!sparkItItem.Item__r.Job_Type__r.Name}</apex:outputLabel> 
+           </apex:column>  
+        </apex:pageBlockTable>
+      </apex:form>
+    </apex:outputPanel>
+  </apex:pageblock>
+  <apex:outputpanel >
+    <apex:actionstatus id="status">
+    <apex:facet name="start">
+      <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+             height: 100%;opacity:0.65;width:100%;z-index:9000;">
+        <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+            <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+            <span class="waitingDescription">Please Wait...</span>
+        </div>
+      </div>
+    </apex:facet>
+    </apex:actionstatus>
+  </apex:outputpanel>
+</apex:component>

@@ -1,0 +1,378 @@
+<apex:page standardController="Milestone1_Project__c" extensions="ProjectBriefController" id="pg" title="Project Creative Brief">
+  <style>
+    .container {
+      width: 100%;
+    }
+    .label {
+      width: 15%;
+      background-color: #D9D9D9;
+      font-weight: bold;
+      vertical-align: middle !important;
+    }
+    
+    .data {
+      width: 35%;
+      vertical-align: middle;
+    }
+    
+    .checkboxColumn label {
+      font-weight:bold; 
+    }
+    
+    .backgroundHeader {
+      background-color: #D9D9D9;
+    }
+    
+    .backgroundLabel {
+      font-weight: bold;
+      width: 25%;
+      vertical-align: middle !important;
+    }
+    .backgroundData {
+      vertical-align: middle;
+    }
+    
+    .labelClass {
+      font-weight: bold;
+      vertical-align: middle !important;
+    }
+    
+    textarea {
+      width: 99%;
+    }
+    
+    
+  </style>
+   <script>
+      window.onload = function() {
+        var datePicker = document.getElementById('datePicker');
+        if(datePicker != null && datePicker != 'undefined') {
+          datePicker.style.display = 'none';
+        }
+      }
+   </script>
+    <apex:sectionHeader title="Program Communication Brief" />
+    <apex:pageMessages id="msgs" />
+    <apex:form >
+        <div style="text-align:center;">
+           <apex:commandButton value="Edit" rendered="{!!isEditMode}" action="{!openEditMode}"/>
+           <apex:commandButton value="Print" rendered="{!!isEditMode}" onClick="window.open('/apex/ProjectBriefPrintView?Id={!projectRecord.Id}', '_blank'); return false;" />
+           <apex:commandButton value="Save" rendered="{!isEditMode}" action="{!saveProgram}"/>
+           <apex:commandButton value="Cancel" rendered="{!isEditMode}" action="{!cancelEditMode}"/>
+        </div>
+      <br/>
+      <div class="container" id="containerBlock">
+        <table width="100%" border="1" cellpadding="5" cellspacing="0">
+           <tr>
+             <td class="label">{!$ObjectType.Milestone1_Project__c.Fields.Name.Label}</td>
+             <td class="data">
+               <apex:outputField value="{!projectRecord.Name}" />
+             </td>
+             <td class="label">Project Level</td>
+             <td class="data checkboxColumn"> 
+               <apex:selectCheckboxes value="{!projectRecord.recordType.Name}" layout="lineDirection" disabled="true">
+                 <apex:selectOptions value="{!projectLevel}" />
+               </apex:selectCheckboxes>
+           </td>
+           </tr>
+           <tr>
+           <td class="label">Requestor</td>
+           <td class="data">
+             <apex:outputField value="{!projectRecord.Requestor__c}" />
+           </td>
+           <td class="label">{!$ObjectType.Milestone1_Project__c.Fields.Spark_It__c.Label}</td>
+           <td class="data">
+             <apex:outputField value="{!Milestone1_Project__c.Spark_It__c}" />
+           </td>
+         </tr>
+         <tr>
+         <td class="label">Requestor Department</td>
+           <td class="data">
+             <apex:outputField value="{!projectRecord.Requestor__r.Department}" />
+           </td>
+           <td class="label">Requestor Phone</td>
+           <td class="data" >
+             <apex:outputField value="{!projectRecord.Requestor__r.Phone}" />
+           </td>
+         </tr>
+         <tr>
+           <td class="label">VP</td>
+           <td class="data">
+             <apex:outputField value="{!projectRecord.Requestor__r.ManagerId}" />
+           </td>
+           <td class="label">{!$ObjectType.Milestone1_Project__c.Fields.Go_Live_Date__c.Label}</td>
+           <td class="data">
+             <apex:inputField value="{!projectRecord.Go_Live_Date__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Go_Live_Date__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>
+         <tr>
+           <td class="label">{!$ObjectType.Milestone1_Project__c.Fields.KickOff__c.Label}</td>
+           <td class="data">
+              <apex:outputField value="{!projectRecord.KickOff__c}"/>
+           </td>
+           <td class="label">{!$ObjectType.Milestone1_Project__c.Fields.Deadline__c.Label}</td>
+           <td class="data">
+             <apex:inputField value="{!projectRecord.Deadline__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Deadline__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>
+        </table>
+        
+        <br/><br/>
+        <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+           <tr class="backgroundHeader">
+             <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Background__c.Label}</td>
+             <td class="backgroundData">What is the program and why is it being initiated?</td>
+           </tr>        
+         <tr>
+           <td colspan="2">
+             <apex:inputField value="{!projectRecord.Background__c}" rendered="{!isEditMode}" />
+             <apex:outputField value="{!projectRecord.Background__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">Program Assignment</td>
+           <td class="backgroundData">What are the specific details?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Milestone1_Project__c.Fields.Objectives__c.Label}:</label>&nbsp; 
+             <apex:inputField value="{!projectRecord.Objectives__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Objectives__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>  
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Milestone1_Project__c.Fields.Size_of_Prize__c.Label}:</label>&nbsp; 
+             <apex:inputField value="{!projectRecord.Size_of_Prize__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Size_of_Prize__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>  
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Milestone1_Project__c.Fields.Business_and_marketing_success_measures__c.Label}:</label>&nbsp; 
+             <apex:inputField value="{!projectRecord.Business_and_marketing_success_measures__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Business_and_marketing_success_measures__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>    
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">Shopper Profile</td>
+           <td class="backgroundData">Who are we trying to reach?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Milestone1_Project__c.Fields.Target_Audience__c.Label}:</label>&nbsp; 
+             <apex:inputField value="{!projectRecord.Target_Audience__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Target_Audience__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr> 
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Milestone1_Project__c.Fields.Source_of_Volume__c.Label}: </label>&nbsp; 
+             <apex:inputField value="{!projectRecord.Source_of_Volume__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Source_of_Volume__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>     
+         <tr>
+           <td colspan="2">
+             <label style="font-weight:bold;">{!$ObjectType.Milestone1_Project__c.Fields.Customer_Segments_or_Media_DMAs__c.Label}:</label>&nbsp; 
+             <apex:inputField value="{!projectRecord.Customer_Segments_or_Media_DMAs__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Customer_Segments_or_Media_DMAs__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>      
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Consumer_and_Shopper_Insights__c.Label}</td>
+           <td class="backgroundData">What insights are influencing the program?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+            <apex:inputField value="{!projectRecord.Consumer_and_Shopper_Insights__c}" rendered="{!isEditMode}"/>
+            <apex:outputField value="{!projectRecord.Consumer_and_Shopper_Insights__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Shopper_Barriers_to_Purchase__c.Label}</td>
+           <td class="backgroundData">Why aren't shoppers engaged?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <apex:inputField value="{!projectRecord.Shopper_Barriers_to_Purchase__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Shopper_Barriers_to_Purchase__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Hierarchy__c.Label}</td>
+           <td class="backgroundData">What is the #1 benefit you want the shopper to know?  Provide detailed proof points that support the benefit. Include call to action, any offer or promotional details.</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <apex:inputField value="{!projectRecord.Hierarchy__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Hierarchy__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>        
+      </table>
+      
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Mandatories__c.Label}</td>
+           <td class="backgroundData">Are there additional considerations to be aware of?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <apex:inputField value="{!projectRecord.Mandatories__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Mandatories__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Duration__c.Label}</td>
+           <td class="backgroundData">What is the milestone schedule?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+            <apex:outputText value="{!projectRecord.Duration__c} Days" rendered="{!projectRecord.Duration__c != null}"/></td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Budget__c.Label}</td>
+           <td class="backgroundData">What is the allocated budget?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+             <apex:inputField value="{!projectRecord.Budget__c}" rendered="{!isEditMode}"/>
+             <apex:outputField value="{!projectRecord.Budget__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Communication_Strategy__c.Label}</td>
+           <td class="backgroundData">What are the communication vehicles (include objectives, call to action for each if different)?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+              <apex:inputField value="{!projectRecord.Communication_Strategy__c}" rendered="{!isEditMode}"/>
+              <apex:outputField value="{!projectRecord.Communication_Strategy__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>        
+      </table>
+      
+      <!-- Start here  Task T-286487 - Sudhir Kumar Jagetiya -->
+       <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Assets_Content__c.Label}</td>
+           <td class="backgroundData">Are there any existing assets that should be referenced for this request? If so, where are they located?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+              <apex:inputField value="{!projectRecord.Assets_Content__c}" rendered="{!isEditMode}"/>
+              <apex:outputField value="{!projectRecord.Assets_Content__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>        
+      </table>
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">{!$ObjectType.Milestone1_Project__c.Fields.Other_Properties__c.Label}</td>
+           <td class="backgroundData">Are there any properties to reference for this project (e.g. landing page, www.boxtops.com, facebook page)?</td>
+         </tr>        
+         <tr>
+           <td colspan="2">
+              <apex:inputField value="{!projectRecord.Other_Properties__c}" rendered="{!isEditMode}"/>
+              <apex:outputField value="{!projectRecord.Other_Properties__c}" rendered="{!!isEditMode}"/>
+           </td>
+         </tr>        
+      </table>
+      <!-- End here  Task T-286487 - Sudhir Kumar Jagetiya -->
+      <!-- Changes for Division T-280433  - Reetesh Makkar -->
+      
+      <br/><br/>
+      <table width="100%" border="1" cellpadding="5" cellspacing="0"> 
+         <tr class="backgroundHeader">
+           <td class="backgroundLabel">Division/Banner by Tiers</td>
+           <td class="backgroundData">Check all that apply.</td>
+         </tr>        
+         <tr>
+           <td colspan="2" class="backgroundData">
+              <!-- <apex:inputField value="{!projectRecord.Full_Company__c}" rendered="{!isEditMode}"/> 
+              <apex:outputField value="{!projectRecord.Full_Company__c}" rendered="{!!isEditMode}"/>
+              {!$ObjectType.Milestone1_Project__c.Fields.Full_Company__c.Label} 
+              Corporate-->
+              <apex:selectCheckboxes value="{!selectedDivisionsValues}" layout="lineDirection" disabled="true">
+                <apex:selectOptions value="{!divisionSelectOptions}" />
+               </apex:selectCheckboxes>
+           </td>
+         </tr>   
+         <!--<tr>
+           <td>
+              <apex:outputLabel value="Divisions" styleClass="labelClass" />
+              <table cellpadding="5" cellspacing="0">
+                <tr>
+                  <apex:repeat value="{!tierWithDivisions}" var="key" >
+                     <td style="padding-right: 20px;">
+                      <apex:outputLabel value="{!key}" styleClass="labelClass" />
+                      <br/>
+                      <apex:repeat value="{!tierWithDivisions[key]}" var="keyvalue" >
+                          <input type="checkbox"  disabled="true" checked="true" />
+                          <apex:outputText value="{!keyvalue}" /><br/>
+                      </apex:repeat>
+                     </td>
+                  </apex:repeat>
+                </tr>
+              </table>
+           </td>
+           <td>
+              <apex:outputLabel value="Banners" styleClass="labelClass" />
+              <table cellpadding="5" cellspacing="0">
+                <tr>
+                        <apex:repeat value="{!tierWithBanners}" var="key" >
+                           <td style="padding-right: 20px;">
+                            <apex:outputLabel value="{!key}" styleClass="labelClass" />
+                            <br/>
+                            <apex:repeat value="{!tierWithBanners[key]}" var="keyvalue" >
+                                <input type="checkbox"  disabled="true" checked="true" />
+                                <apex:outputText value="{!keyvalue}" /><br/>
+                            </apex:repeat>
+                           </td>
+                        </apex:repeat>
+                  </tr>
+                </table>
+           </td>
+         </tr>    -->  
+      </table>
+      </div>
+    </apex:form>
+</apex:page>

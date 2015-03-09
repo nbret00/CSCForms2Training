@@ -1,0 +1,47 @@
+<apex:page StandardController="Milestone1_Project__c" Extensions="ProjectCodeSelectorCntrl" id="pg" title="Budget Code">
+  <apex:includeScript value="{!URLFOR($Resource.jquery1_10_2,'jquery-1.10.2.min.js')}" />
+  
+  <apex:form id="frm">
+  <apex:inputHidden id="selectedJobTypeIds" value="{!selectedProjectCodeId}"/>
+    <div id="backgroundDiv" style="width:100%;">
+      <apex:pageBlock title="Budget Codes" id="pageBlock" mode="edit" > 
+        <apex:pageBlockButtons >
+          <input type="button" class="btn" value="Save" onClick="updateProjectCodes();"/>
+          <apex:commandButton value="Cancel" action="{!backToProgram}" />
+        </apex:pageBlockButtons>
+        <apex:pageMessages id="message"/>
+        <br/>
+        <c:TreeViewComponentForProjectCodes SelectedNode=""  counter="1" selectItemCallback="fetchSolutions" hiddenFieldName="pg:frm:selectedJobTypeIds"/>
+      </apex:pageBlock>
+    </div>
+    <apex:outputpanel >
+      <apex:actionstatus id="status">
+        <apex:facet name="start">
+            <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                   height: 100%;opacity:0.65;width:100%;"> 
+                <div class="waitingHolder" style="width: 91px;">
+                    <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                    <span class="waitingDescription">Please Wait...</span>
+                </div>
+            </div>
+        </apex:facet>
+      </apex:actionstatus>
+    </apex:outputpanel>
+    <apex:actionFunction name="updateProgram" action="{!updateProgram}" status="status"/>
+    
+    <script>
+      function fetchSolutions(objId){}
+      
+      function updateProjectCodes() {
+        var selectedJobTypeIds = document.getElementById('pg:frm:selectedJobTypeIds').value;
+        if(selectedJobTypeIds != '' && selectedJobTypeIds != 'undefine') {
+           updateProgram();
+        }
+        else {
+          alert('Please select project code.');
+        }
+      }
+      
+    </script>
+  </apex:form>
+</apex:page>

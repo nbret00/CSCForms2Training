@@ -1,0 +1,69 @@
+<apex:component controller="TaskComponentController">
+
+<apex:outputpanel >
+        <apex:actionstatus id="waitStatus">
+            <apex:facet name="start">
+                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                       height: 100%;opacity:0.65;width:100%;"> 
+                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                        <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                        <span class="waitingDescription">Loading...</span>
+                    </div>
+                </div>
+            </apex:facet>
+        </apex:actionstatus>
+    </apex:outputpanel>
+
+<div class="tasks">
+            
+</div>
+
+<apex:pageBlock id="taskBlock">
+    <apex:form >
+    <apex:actionFunction name="searchTask" action="{!queryTask}" rerender="taskBlock" status="waitStatus">
+    <apex:param assignTo="{!filterParam}" value="" name="param1"/>
+</apex:actionFunction> 
+    <div class="pbHeader">
+<table border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+        <tr>
+            <td class="pbTitle">
+                <h2 class="mainTitle"> My Tasks</h2>
+            </td>
+            <td class="pbButton">
+                  <!--  <apex:commandButton value="New Task" onclick="return openCreateNewRecords('{!URLFOR($Action.Task.Edit,'00T')}');" /> -->
+                    
+                
+            </td>
+            <td class="pbHelp">
+                    <apex:selectList value="{!filterParam}" size="1" onchange="searchTask(this.value);">
+                    <apex:selectOption itemValue="0" itemLabel="Overdue"/>
+                    <apex:selectOption itemValue="1" itemLabel="Today"/>
+                    <apex:selectOption itemValue="2" itemLabel="Today + Overdue"/>
+                    <apex:selectOption itemValue="3" itemLabel="Tomorrow"/>
+                    <apex:selectOption itemValue="4" itemLabel="Next 7 Days"/>
+                    <apex:selectOption itemValue="5" itemLabel="Next 7 Days + Overdue"/>
+                    <apex:selectOption itemValue="6" itemLabel="This Month"/>
+                    <apex:selectOption itemValue="7" itemLabel="All Open"/>                 
+                </apex:selectList>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</div>
+</apex:form>
+    <apex:outputPanel layout="block" styleClass="content-box" rendered="{!ISBLANK(taskList)}">You have no open tasks for this period</apex:outputPanel>
+    <apex:pageBlockTable value="{!taskList}" var="task" rendered="{!NOT(ISBLANK(taskList))}">
+        <apex:column headerValue="Complete">
+            <apex:outputLink value="{!URLFOR($Action.Task.Edit,task.id)}&close=1">X</apex:outputLink>
+        </apex:column>
+        <apex:column value="{!task.ActivityDate}"/>
+        <apex:column headerValue="Subject">
+            <apex:outputLink value="{!URLFOR($Action.Task.View,task.id)}">{!task.Subject}</apex:outputLink>
+        </apex:column>
+        <apex:column value="{!task.WhoID}"/>
+        <apex:column value="{!task.WhatId}"/>
+    </apex:pageBlockTable>
+</apex:pageBlock>
+
+</apex:component>

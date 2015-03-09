@@ -1,0 +1,4 @@
+<apex:page title="Items" >
+  <apex:sectionHeader title="Items" subtitle="Home" />
+  <c:SparkItItemListViewComponent />
+</apex:page>

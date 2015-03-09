@@ -1,0 +1,12 @@
+<apex:component controller="SpringCMEos.DSWController" access="global">
+
+	<apex:messages />
+
+	<apex:attribute name="objectId" access="global" description="This is the ID of the object that the page that this is embedded into."  type="Id" required="false" assignTo="{!objectIdNumber}"/>
+	<apex:attribute name="objectType" access="global" description="This is the objectType of the page that this is embedded into."  type="String" required="false" assignTo="{!objType}"/>
+	<apex:attribute name="searchName" access="global" description="This is the search Name of the object type that this search was setup for."  type="String" required="false" assignTo="{!searchName}"/>
+	<apex:attribute name="partnerUrl" access="global" description="Salesforce Partner URL"  type="String" required="false" assignTo="{!partnerWebUrl}" default="{!$Api.Partner_Server_URL_180}"/>
+	
+	<apex:iframe id="springDSWGrid" frameborder="0" width="100%" scrolling="yes" src="{!SpringCMUrl}&sfsid={!$Api.Session_ID}&sfapiurl={!$Api.Partner_Server_URL_180}" ></apex:iframe>
+
+</apex:component>

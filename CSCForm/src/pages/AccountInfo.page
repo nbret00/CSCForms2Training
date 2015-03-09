@@ -1,0 +1,42 @@
+<apex:page standardController="Account" extensions="AccountInfoController" id="pg">
+	<apex:sectionHeader title="{!account.Name}" />
+	<br/>
+	<apex:pageMessages id="msg"/>
+	<apex:form id="frm">
+	<apex:outputpanel >
+             <apex:actionstatus id="statusC">
+               <apex:facet name="start">
+                 <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                        height: 100%;opacity:0.65;width:100%;">
+                    <div class="waitingHolder" style="top: 100px; width: 100px;">
+                        <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                        <span class="waitingDescription">Please Wait...</span>
+                    </div>
+                 </div>
+               </apex:facet>
+             </apex:actionstatus>
+       </apex:outputpanel>
+	<apex:pageBlock id="pb1" rendered="{!!isEditMode}">
+<!-- 			<apex:pageBlockButtons > -->
+<!-- 	       		<apex:commandButton id="edit" value="Edit" action="{!editAccount}" rerender="frm" status="statusC"/> -->
+<!-- 	       </apex:pageBlockButtons> -->
+	       <apex:pageblockSection title="Account Information" >
+	       		<apex:repeat value="{!$ObjectType.Account.FieldSets.Fields_To_Show_On_Portal}" var="f">
+	                  <apex:outputField value="{!account[f.fieldPath]}" />
+	              </apex:repeat>
+	       </apex:pageblockSection>
+			</apex:pageBlock>
+<!-- 	<apex:pageBlock id="pb2" rendered="{!isEditMode}"> -->
+<!-- 			<apex:pageBlockButtons > -->
+<!-- 	       		<apex:commandButton id="save" value="Save" action="{!saveAccount}" rerender="frm" status="statusC"/> -->
+<!-- 	       		<apex:commandButton id="cancel" value="Cancel" action="{!cancelAccount}" rerender="frm" status="statusC"/> -->
+<!-- 	       </apex:pageBlockButtons> -->
+<!-- 	       <apex:pageblockSection title="Account Information" > -->
+<!-- 	       		<apex:repeat value="{!$ObjectType.Account.FieldSets.Fields_To_Show_On_Portal}" var="f"> -->
+<!-- 	                  <apex:inputField value="{!account[f.fieldPath]}" /> -->
+<!-- 	              </apex:repeat> -->
+<!-- 	       </apex:pageblockSection> -->
+<!-- 			</apex:pageBlock> -->
+	</apex:form>
+			<apex:relatedList list="Contacts"/>
+</apex:page>

@@ -1,0 +1,90 @@
+<apex:page StandardController="Milestone1_Project__c" Extensions="CreateProgramItemsExtension" id="pg">
+  <apex:includeScript value="{!URLFOR($Resource.jquery1_10_2,'jquery-1.10.2.min.js')}" />
+  
+  <apex:form id="frm">
+  <apex:inputHidden id="selectedJobTypeIds" value="{!selectedJobTypeIds}"/>
+	  <div id="backgroundDiv" style="width:100%;">
+	    <apex:pageBlock title="Job Type" id="pageBlock" mode="edit" > 
+	      <apex:pageBlockButtons >
+	        <input type="button" class="btn" value="Save" onClick="createSparkItItems();"/>
+	        <apex:commandButton value="Cancel" action="{!backToProgram}" />
+	      </apex:pageBlockButtons>
+	      <apex:pageMessages id="message"/>
+	      <br/>
+	      <c:TreeViewComponent SelectedNode="{!selectedJobTypeIds}" ObjectNameValue="Job_Type__c" SelectedCategoryValue="all" forPage="CreateProgramItems" counter="1" selectItemCallback="fetchSolutions" hiddenFieldName="pg:frm:selectedJobTypeIds"/>
+	    </apex:pageBlock>
+	  </div>
+	  <apex:outputpanel >
+      <apex:actionstatus id="status">
+        <apex:facet name="start">
+            <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                   height: 100%;opacity:0.65;width:100%;"> 
+                <div class="waitingHolder" style="width: 91px;">
+                    <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                    <span class="waitingDescription">Please Wait...</span>
+                </div>
+            </div>
+        </apex:facet>
+      </apex:actionstatus>
+    </apex:outputpanel>
+	  <apex:actionFunction name="createItems" action="{!createItems}" status="status"/>
+	  <div id="DeleteItemAlertSectionOnSave" style="display:none;">
+        <table width="100%">
+          <tr><td class="labelCol" >You are about to DELETE following Items from your program, do you want to continue?</td></tr>
+          <tr><td><div id="toBeDeletedItems"></div></td></tr>
+          <tr><td align="center"><input class="btn" type="button" value="Yes" Name="Yes" id="Yes" onClick="savePopupYesAction();"/>
+          <input class="btn" type="button" value="No" Name="No" id="No" onClick="savePopupNoAction();"/></td></tr>
+      </table>
+    </div>
+	  <script>
+	    function fetchSolutions(objId){}
+	    
+	    function createSparkItItems() {
+	      var selectedJobTypeIds = document.getElementById('pg:frm:selectedJobTypeIds').value;
+	      if(selectedJobTypeIds != '' && selectedJobTypeIds != 'undefine') {
+	         if(Object.getOwnPropertyNames(itemsToBeDelete).length > 0){
+            prepareDialog();
+           }
+           else{
+            createItems();
+           }
+	      }
+	      else {
+	        alert('Please select at least one Job Type.');
+	      }
+	    }
+	    function savePopupYesAction(){
+	     createItems();
+       sfdcPage.dialogs['SFDCDialogSave'].hide();
+	    }
+	    function savePopupNoAction(){
+	     for(var itemIndex in itemsKeyToBeDeleted){
+         itemsToBeDelete[itemsKeyToBeDeleted[itemIndex]].select(true);
+       }
+       itemsKeyToBeDeleted = [];
+	     sfdcPage.dialogs['SFDCDialogSave'].hide();
+	    }
+	    function prepareDialog(){
+	      var deleteItemObj = document.getElementById("toBeDeletedItems");
+	      var deleteItemObjInnerHtml = "";
+	      for(var itemIndex in itemsKeyToBeDeleted){
+	         deleteItemObjInnerHtml += ('- '+itemsToBeDelete[itemsKeyToBeDeleted[itemIndex]].data.title+'</br>');
+	      }
+	      deleteItemObj.innerHTML = deleteItemObjInnerHtml;
+	      document.getElementById("DeleteItemAlertSectionOnSave").style.display="block";
+	      if(sfdcPage.dialogs['SFDCDialogSave'] == null) { // checking if SFDCDialogSave modal popup already created on page.
+            sfdcPage.dialogs['SFDCDialogSave'] = new SimpleDialog('SFDCDialogSave', false); // creating modal popup with name ‘SFDCDialogSave’
+            sfdcPage.dialogs['SFDCDialogSave'].title = "Delete Item Confirm?"; // setting title of popup
+            sfdcPage.dialogs['SFDCDialogSave'].isMovable = true; //set true if want movable
+            sfdcPage.dialogs['SFDCDialogSave'].displayX = false; // set true if want close button on header
+            sfdcPage.dialogs['SFDCDialogSave'].extraClass = "" // use to set any extra style class if wanted
+            sfdcPage.dialogs['SFDCDialogSave'].width = 433; // set size of popup default = 400
+            sfdcPage.dialogs['SFDCDialogSave'].isModal = true; // set true if want block background.
+            sfdcPage.dialogs['SFDCDialogSave'].createDialog(); // finally call this method to create modal pop up  and append to current page.
+            sfdcPage.dialogs['SFDCDialogSave'].importContentNode(document.getElementById('DeleteItemAlertSectionOnSave'));//sent content on modal pop up (use any existing block Id)
+         }
+        sfdcPage.dialogs['SFDCDialogSave'].show();// show modal popup
+	    }
+	  </script>
+  </apex:form>
+</apex:page>

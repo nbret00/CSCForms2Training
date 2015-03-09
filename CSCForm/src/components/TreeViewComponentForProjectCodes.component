@@ -1,0 +1,207 @@
+<apex:component controller="TreeViewComponentCntrl">
+
+  <apex:attribute name="SelectedCategoryValue" description="Name of object to show details" type="String" required="false" assignTo="{!SelectedCategory}"/>
+  <apex:attribute name="SelectedNode" description="Name of object to show details" type="String" required="false" assignTo="{!ProductId}"/>
+  <apex:attribute name="hiddenFieldName" description="Name of object to show details" type="String" required="false"/>
+  <apex:attribute name="counter" description="Component counter" type="String" required="false"/>
+  <apex:attribute name="selectItemCallback" type="string" description="The name of a function to call after an item is selected" />
+            
+  <apex:stylesheet value="{!URLFOR($Resource.DynaTree, 'src/skin/ui.dynatree.css')}" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+  <script src="{!URLFOR($Resource.DynaTree, 'jquery/jquery.cookie.js' )}"></script>  
+  <script src="{!URLFOR($Resource.DynaTree, 'src/jquery.dynatree.js' )}"></script> 
+      <div id="treeViewId">
+        <apex:PageBlock id="PgBlckId" >
+           <apex:outputpanel > 
+                      <apex:actionstatus id="mystatus2">
+                          <apex:facet name="start">
+                              <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                     height: 100%;opacity:0.65;width:100%;"> 
+                                  <div class="waitingHolder" style="width: 91px;">
+                                      <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                                      <span class="waitingDescription">Please Wait...</span>
+                                  </div>
+                              </div>
+                          </apex:facet>
+                      </apex:actionstatus>
+                 </apex:outputpanel>
+           <apex:actionFunction rerender="PgBlckId" name="callInitAction" action="{!init}" oncomplete="generateTreeStructure({!jsonString});" status="mystatus2"/>
+            &nbsp;&nbsp;&nbsp;     
+            <apex:inputText value="{!InputText}" Id="fnameId"  onkeydown="return doSearchOnEnter(event);" style="margin-left: 10px;"/> 
+            <!-- Search results are rendered on click of Search button with help of actionFunction and param tags.-->      
+            <!-- Enables collapse and exapand all link on VF page.--> 
+            <apex:commandLink reRender="tree{!counter}" value="Expand All"  onClick="Expand(document.getElementById('{!$Component.PgBlckId.fnameId}').value,'{!counter}');" />&nbsp;&nbsp;
+            <apex:commandLink reRender="tree{!counter}" value="Collapse All"  onClick="Collapse(document.getElementById('{!$Component.PgBlckId.fnameId}').value,'{!counter}');" />
+            <apex:PageBlockSection columns="1">
+            <!-- Below div is rendered on loading of VF page with help of DynaTree JSQuery.--> 
+                <div id="tree{!counter}"> </div>
+            </apex:PageBlockSection>
+        </apex:PageBlock>      
+        </div>
+        <!-- On VF page load , below script gets executed which displays the tree structure. -->
+        <script type="text/javascript">
+         var j$ = jQuery.noConflict();
+        function doSearchOnEnter(e)
+         {
+             var keynum = 0;
+             if (window.event) 
+             { 
+                 keynum = window.event.keyCode; 
+             }
+             else if(e.which)
+             { keynum = e.which; }
+             if (keynum == 13){
+                e.cancelBubble = true;
+        e.returnValue = false;
+                return false;               
+             } else{
+               Search(document.getElementById('{!$Component.PgBlckId.fnameId}').value,'{!counter}');                      
+                 return true;           
+             }         
+         }
+      
+         var selectItemCallback = '{!selectItemCallback}';
+         var hiddenFieldName = '{!hiddenFieldName}';
+         var keyId;
+         var keyName;
+         var find=0;
+         var sMode = 1;
+         var minExpand = 1;
+         var checkBoxClass = 'dynatree-checkbox';
+         sMode = 1;
+         checkBoxClass = 'dynatree-radio';
+            
+        /* This function is used to search the entered keyword in tree on click of "Search" button 
+           available on VF page. */ 
+        function Search(value,treeNo){ 
+           find=0;
+           var treeName = "#tree"+treeNo;
+           j$(treeName).dynatree("getRoot").visit(function(node){
+                node.expand(false);
+                
+                // If the keyword is found , the desired nodes are highlighted.         
+                if(node.data.title.toLowerCase().trim().indexOf(value.toLowerCase().trim())>=0 && value!=''){
+                    node.data.title="<Strong style='color:#73D44C'>"+node.data.title +"</strong>";
+                    find=1;
+                    node.makeVisible();
+                    node.render();
+                }
+                 // If the keyword is not found , the desired nodes appear in normal fashion. 
+                else if(node.data.title.toLowerCase().trim().indexOf(value.toLowerCase().trim())<0 || value=='' ){          
+                     if((node.data.title).indexOf('<')!=-1){
+                         node.data.title= (node.data.title).substring(30,(node.data.title).length-9);
+                     }               
+                    node.render();
+                }
+            }); 
+        }   
+            function loadingStatus(statusFlag){
+                if(statusFlag){
+                    j$(".loadingstatus").show();
+                }
+                else{
+                    j$(".loadingstatus").hide();
+                }
+            }
+            // This function expands all the nodes of tree on click of "Expand All" link available on VF page.
+            function Expand(value,treeNo){   
+               var treeName = "#tree"+treeNo;
+                j$(treeName).dynatree("getRoot").visit(function(node){
+                    if(node.data.title.toLowerCase().trim().indexOf(value.toLowerCase().trim())>=0 && value!=''){
+                        node.data.title="<Strong style='color:#73D44C'>"+node.data.title +"</strong>";
+                        node.makeVisible();
+                        node.render();
+                    }
+                    if((node.data.title).indexOf('<')!=-1){
+                         node.data.title= (node.data.title).substring(30,(node.data.title).length-9);
+                     }               
+                     node.render();
+                    node.expand(true);
+                });
+            }    
+            
+            // This function collapses all the nodes of tree on click of "Collapse All" link available on VF page.   
+            function Collapse(value,treeNo){       
+               var treeName = "#tree"+treeNo;
+                j$(treeName).dynatree("getRoot").visit(function(node){
+                    if(node.data.title.toLowerCase().trim().indexOf(value.toLowerCase().trim())>=0 ){
+                        node.data.title="<Strong style='color:#73D44C'>"+node.data.title +"</strong>";
+                        node.render();
+                    }
+                    if((node.data.title).indexOf('<')!=-1){
+                         node.data.title= (node.data.title).substring(30,(node.data.title).length-9);
+                     }               
+                     node.render();
+                    node.expand(false);
+                });
+                
+            }   
+            
+           
+            // Below function displays an error message , if keyword is not found in the tree.
+            function hasFind(){
+                if(find==0){
+                    alert('No Match found.');        
+                }
+                
+            }
+            
+            
+            j$(function() {
+              callInitAction();
+            });
+            
+      
+      function generateTreeStructure(listNodes){
+        document.getElementById('treeViewId').className = "overflowClass";
+        
+                j$("#tree{!counter}").dynatree({
+                    onActivate: function(node) {},                            
+                    persist: false,
+                    autoCollapse: false,
+                    generateIds: false,
+                    checkbox: true,
+                    minExpandLevel: minExpand,
+                    onPostInit: function(isReloading, isError) {
+                      var tree = j$('#tree{!counter}').dynatree('getTree');
+                      var selKeys = j$.map(tree.getSelectedNodes(), function(node){
+                      node.makeVisible();
+                  });
+               }, 
+                    classNames: {
+                        checkbox: checkBoxClass,
+                        expanded: "dynatree-expanded"
+                    },
+                    selectMode: sMode,
+                    children: listNodes,           
+                    onSelect: function(select, node) {
+                        // Get a list of all selected nodes, and convert to a key array:
+                        var selKeys = j$.map(node.tree.getSelectedNodes(), function(node){                  
+                            keyId=node.data.key;   
+                            keyName=node.data.title;
+                            while((node.data.title).indexOf('<')!=-1){
+                            node.data.title= (node.data.title).substring(30,(node.data.title).length-9);
+                        }
+                        keyName=node.data.title;     
+                            //Only for problem category
+                            if(hiddenFieldName.length > 0) {
+                                var problemCatObj = document.getElementById(hiddenFieldName);
+                                if(problemCatObj){
+                                    problemCatObj.value=keyId;
+                                }
+                            } 
+                            if (selectItemCallback.length > 0) {
+                                window[selectItemCallback](keyId);
+                            }
+                            return node.data.key;
+                        });
+                  }  //removed , suffixed to resolve the issue in IE comptatibility view: I-69604
+                     
+                });
+            }
+        </script>
+        <!-- Below line displayes the image and header title displayed on VF page.-->
+       
+        
+    
+</apex:component>

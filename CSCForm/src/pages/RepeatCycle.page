@@ -1,0 +1,3 @@
+<apex:page standardController="Spark_It_Item__c" extensions="RepeatCycleCtrl" action="{!cloneTask}">
+ <apex:pageMessages />
+</apex:page>

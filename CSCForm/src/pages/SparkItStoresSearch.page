@@ -1,0 +1,120 @@
+<apex:page standardController="Milestone1_Project__c" extensions="SparkItStoresSearchController" id="pg">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<apex:sectionHeader title="Associate Stores with Program" rendered="{!!isCalledFromSparkItSearch}"/>
+	<br/>
+	<apex:pageMessages id="msg"/>
+	<apex:form id="frm">
+		<apex:pageBlock id="pb">
+			<apex:actionFunction name="renderNewFieldsAction" action="{!fetchSelectedFields}" rerender="searchSection" status="statusC"/>
+			<apex:outputpanel >
+             <apex:actionstatus id="statusC">
+               <apex:facet name="start">
+                 <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                        height: 100%;opacity:0.65;width:100%;">
+                    <div class="waitingHolder" style="top: 100px; width: 100px;">
+                        <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                        <span class="waitingDescription">Please Wait...</span>
+                    </div>
+                 </div>
+               </apex:facet>
+             </apex:actionstatus>
+       </apex:outputpanel>
+       <div style="text-align: center;">
+       		<apex:commandButton value="Back" action="{!doBack}" rendered="{!!isCalledFromSparkItSearch}"/>
+       </div>
+       <br/>
+       <apex:pageBlockButtons location="bottom">
+       		<apex:commandButton id="searchButton" value="Search" action="{!searchStores}" rerender="pb2, msg" status="statusC" />
+       </apex:pageBlockButtons>
+
+       		<apex:pageblockSection title="Select Fields to Search" columns="1">
+
+	            <c:MultiselectPicklist leftLabel="Available Filter Fields"
+				    leftSideOptions="{!allFields}"
+				    rightLabel="Selected Filter Fields"
+				    rightSideOptions="{!selectedFields}"
+				    size="10"
+				    width="150px"/>
+
+<!--				<apex:commandButton value="Enter criteria" action="{!fetchSelectedFields}" rerender="searchSection" status="statusC"/>-->
+				<br/>
+	        </apex:pageblockSection>
+
+			<apex:pageblockSection title="Enter Search Criteria" columns="2" id="searchSection">
+				<apex:repeat value="{!selectedFields}" var="apiName" id="theRepeat">
+					<apex:inputField value="{!dummyStore[apiName.value]}" />
+   				</apex:repeat>
+
+			</apex:pageblockSection>
+		</apex:pageBlock>
+		<apex:outputPanel id="pb2" >
+		<apex:outputPanel rendered="{!IF(listStores !=null && listStores.size > 0 , true, false)}">
+		<apex:pageBlock >
+			<apex:pageBlockButtons >
+		       		<apex:commandButton value="Associate with Program" action="{!associate}"
+		       				rendered="{!IF(listStores !=null && listStores.size > 0 && !isCalledFromSparkItSearch, true, false)}"/>
+		       </apex:pageBlockButtons>
+				<div style="max-height:400px; overflow:auto;">
+				<table class="list">
+					<thead class="rich-table-thead">
+					<tr class="headerRow">
+						<th class="headerRow" scope="col" colspan="1" style="width:50px;">
+						<div>
+							<input type="checkbox" id="selectall"/>
+						</div>
+						</th>
+						<th class="headerRow" scope="col" colspan="1"><div>Store Name</div></th>
+						<th class="headerRow" scope="col" colspan="1"><div>Division</div></th>
+						<th class="headerRow" scope="col" colspan="1"><div>Banner</div></th>
+						<th class="headerRow" scope="col" colspan="1"><div>Street</div></th>
+						<th class="headerRow" scope="col" colspan="1"><div>City</div></th>
+						<th class="headerRow" scope="col" colspan="1"><div>State</div></th>
+						<th class="headerRow" scope="col" colspan="1"><div>Zip Code</div></th>
+					</tr>
+					</thead>
+					<tbody>
+					<apex:repeat value="{!listStores}" var="outerStore" id="outerRepeat">
+						<apex:repeat value="{!outerStore}" var="item" id="innerRepeat">
+							<tr>
+								<td><apex:inputCheckbox value="{!item.isSelected}" styleClass="case" rendered="{!!isCalledFromSparkItSearch}"/></td>
+								<td><apex:outputLink value="/{!item.store.Id}" target="_blank">{!item.store.Name}</apex:outputLink></td>
+								<td><apex:outputField value="{!item.store.Division__c}"/></td>
+								<td><apex:outputField value="{!item.store.Banner__c}"/></td>
+								<td><apex:outputField value="{!item.store.Street__c}"/></td>
+								<td><apex:outputField value="{!item.store.City__c}"/></td>
+								<td><apex:outputField value="{!item.store.State__c}"/></td>
+								<td><apex:outputField value="{!item.store.Zipcode__c}"/></td>
+
+							</tr>
+						</apex:repeat>
+		   			</apex:repeat>
+		   			</tbody>
+				</table>
+				</div>
+					<SCRIPT language="javascript">
+			$(function(){
+			    // add multiple select / deselect functionality
+			    $("#selectall").click(function () {
+			          $('.case').prop('checked', this.checked);
+			    });
+
+			    // if all checkbox are selected, check the selectall checkbox
+			    // and viceversa
+			    $(".case").click(function(){
+
+					if($(".case").length == $(".case:checked").length) {
+			            $('#selectall').attr('checked', true);
+			        } else {
+			            $('#selectall').removeAttr('checked');
+			        }
+
+			    });
+			});
+
+</SCRIPT>
+		</apex:pageBlock>
+		</apex:outputPanel>
+		</apex:outputPanel>
+
+	</apex:form>
+</apex:page>

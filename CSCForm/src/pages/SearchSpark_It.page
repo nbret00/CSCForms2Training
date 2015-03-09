@@ -1,0 +1,130 @@
+<apex:page controller="SearchSpark_ItController" sidebar="false" showHeader="true" title="Search Program">
+<apex:includeScript value="{!URLFOR($Resource.jquery1_10_2,'jquery-1.10.2.min.js')}" />
+    <apex:outputPanel id="panel">
+    <apex:form id="frm">
+        <apex:pageMessages id="pageMessage" />
+        <script type="text/javascript">
+            function loadfunction(){
+                var filterSize = 360;
+                document.getElementById('{!$Component.filter}').style.width = filterSize + 'px';
+                document.getElementById('{!$Component.result}').style.width = window.screen.availWidth - filterSize - 60 + 'px';
+                jQuery('.hideListButton').each(function() {
+                    twistSection(this);
+                });
+            }
+
+
+            //window.onload = loadfunction;
+            jQuery(document).ready(loadfunction);
+        </script>
+        <apex:actionFunction action="{!renderSectionAction}" name="renderSection" rerender="panel" status="statusC"/>
+        <apex:outputpanel >
+             <apex:actionstatus id="statusC">
+               <apex:facet name="start">
+                 <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                        height: 100%;opacity:0.65;width:100%;">
+                    <div class="waitingHolder" style="top: 100px; width: 100px;">
+                        <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                        <span class="waitingDescription">Please Wait...</span>
+                    </div>
+                 </div>
+               </apex:facet>
+             </apex:actionstatus>
+       </apex:outputpanel>
+        <apex:pageBlock title="Select Search Option">
+                <apex:selectRadio value="{!selectedOption}" onchange="renderSection();">
+                    <apex:selectOptions value="{!options}"/>
+                </apex:selectRadio>
+        </apex:pageBlock>
+        <apex:outputPanel rendered="{!IF(selectedOption == 'sparkIt', true, false)}" id="upperPanel">
+        <apex:outputPanel style="width:360px;float:left;" id="filter" layout="block" >
+            <apex:pageBlock title="Filters">
+                <apex:pageBlockSection columns="1" collapsible="true" title="Template">
+          <!-- Template -->
+          <apex:inputField value="{!milestoneProject.Template__c}" />
+        </apex:pageBlockSection>
+                <apex:pageBlockSection columns="1" collapsible="true" title="Status">
+                    <!-- Status -->
+                    <apex:selectCheckboxes value="{!statusSelected}" title="Select Status" layout="pageDirection">
+                        <apex:selectOptions value="{!statusOptions}" />
+                    </apex:selectCheckboxes>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="1" collapsible="true" title="Campaign">
+                    <!-- Campaign -->
+                    <apex:inputField value="{!milestoneProject.Campaign__c}" label="" />
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="1" collapsible="true" title="Division">
+                    <!-- Division -->
+                    <apex:inputField value="{!milestoneProject.Division__c}" label="" />
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="1" collapsible="true" title="Requester">
+                    <!-- Requestor -->
+                     <apex:inputField value="{!milestoneProject.Requestor__c}" label="" /> 
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="1" collapsible="true" title="Project Level">
+                    <!-- Project Level -->
+                    <apex:selectCheckboxes value="{!plSelected}" title="Select Project Level" layout="pageDirection">
+                        <apex:selectOptions value="{!plOptions}" />
+                    </apex:selectCheckboxes>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="1" collapsible="true" title="Program Name">
+                    <!-- SparkIt! Name -->
+                    <apex:inputField value="{!milestoneProject.Name}" label="" />
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="2" collapsible="true" title="Deadline">
+                    <!-- Deadline -->
+                        <apex:selectList value="{!dateMatch}" size="1" title="Select Date Criteria">
+                            <apex:selectOptions value="{!dateMatchOptions}" />
+                        </apex:selectList>
+                        <apex:inputField value="{!milestoneProject.Deadline__c}" label="" />
+                </apex:pageBlockSection>
+                <!-- <apex:outputText value="Description" styleClass="labelClass" />
+                    <apex:inputField value="{!milestoneProject.Description__c}" label="" /> -->
+                <br />
+                <apex:selectList value="{!match}" size="1">
+                    <apex:selectOptions value="{!matchOptions}" />
+                </apex:selectList>
+                <br /><br />
+                <apex:commandButton action="{!searchSparkIts}" value="Search" reRender="check, pageMessage" status="searchStatus" />
+            </apex:pageBlock>
+        </apex:outputPanel>
+        <apex:outputPanel style="width:1000px;float:right;" id="result" layout="block">
+            <apex:actionStatus startText="Fetching Result. Please Wait...." id="searchStatus"
+                startStyle="color:#cc0000;font-weight:24px" styleClass="labelClass"/>
+            <apex:outputPanel id="check">
+                    <apex:pageBlock title="Result">
+                        <apex:pageBlockTable value="{!milestoneProjects}" var="milestone" rendered="{!milestoneProjects.size > 0 && isFieldSetExists}">
+                            <apex:repeat value="{!$ObjectType.Milestone1_Project__c.FieldSets.SearchSpark_Its}" var="Sparks">
+                                <apex:column >
+                                    <apex:facet name="header">{!Sparks.label}</apex:facet>
+                                        <apex:outputLink value="/{!milestone.Id}" rendered="{!(Sparks.fieldPath == 'Name')}" target="_blank">
+                                            {!milestone.Name}
+                                        </apex:outputLink>
+                                    <apex:outputField value="{!milestone[Sparks]}" rendered="{!NOT(Sparks.fieldPath == 'Name')}"/>
+                                </apex:column>
+                            </apex:repeat>
+                        </apex:pageBlockTable>
+                        <apex:pageBlockTable value="{!milestoneProjects}" var="milestone" rendered="{!milestoneProjects.size > 0 && NOT(isFieldSetExists)}">
+                            <apex:column >
+                                <apex:outputLink value="/{!milestone.Id}" target="_blank">
+                                    {!milestone.Name}
+                                </apex:outputLink>
+                            </apex:column>
+                            <apex:column value="{!milestone.Campaign__c}" />
+                            <apex:column value="{!milestone.Division__c}" />
+                            <apex:column value="{!milestone.Description__c}" />
+                        </apex:pageBlockTable>
+                        <apex:outputText rendered="{!milestoneProjects.size == 0}" value="There are no records based on search filters." />
+                    </apex:pageBlock>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        </apex:outputPanel>
+        </apex:form>
+        <apex:outputPanel rendered="{!IF(selectedOption == 'store', true, false)}" id="storePanel">
+            <apex:include pageName="SparkItStoresSearch"/>
+        </apex:outputPanel>
+        </apex:outputPanel>
+<style>
+    .labelClass {font-weight: bold;}
+</style>
+</apex:page>
